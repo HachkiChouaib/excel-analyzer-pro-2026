@@ -16,6 +16,7 @@ from pathlib import Path
 import streamlit as st
 
 from pages import analysis, cleaning, dashboard, login, report, visualization
+from utils import theme
 from utils.helpers import ensure_directories
 
 # --- Static paths ---------------------------------------------------------
@@ -32,11 +33,31 @@ PAGES: dict[str, tuple[str, object]] = {
 }
 
 
-def load_css() -> None:
-    """Inject the custom stylesheet, if present."""
+def apply_styles() -> None:
+    """Inject the dynamic theme palette followed by the structural stylesheet.
+
+    Order matters: theme variables are defined first, then ``styles.css``
+    (which references those variables) is applied on top.
+    """
+    mode = st.session_state.get("theme", "light")
+    css = theme.build_css(mode)
     if CSS_FILE.exists():
-        st.markdown(f"<style>{CSS_FILE.read_text(encoding='utf-8')}</style>",
-                    unsafe_allow_html=True)
+        css += CSS_FILE.read_text(encoding="utf-8")
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+
+
+def theme_toggle(key: str) -> None:
+    """Render a light/dark theme switch bound to session state.
+
+    Args:
+        key: Unique Streamlit widget key (a screen may render several).
+    """
+    is_dark = st.session_state.get("theme", "light") == "dark"
+    new_dark = st.toggle("🌙 Dark mode", value=is_dark, key=key)
+    new_mode = "dark" if new_dark else "light"
+    if new_mode != st.session_state.get("theme", "light"):
+        st.session_state["theme"] = new_mode
+        st.rerun()
 
 
 def render_sidebar() -> str:
@@ -61,9 +82,8 @@ def render_sidebar() -> str:
         )
 
         st.divider()
-        # Theme toggle is informational here; the active palette is set in
-        # config.toml. Streamlit's built-in Settings menu switches light/dark.
-        st.caption("Tip: use the ☰ menu → Settings to switch light/dark theme.")
+        # Functional light/dark switch (re-applies the palette on change).
+        theme_toggle(key="theme_toggle_sidebar")
 
         if st.session_state.get("file_info"):
             info = st.session_state["file_info"]
@@ -90,7 +110,9 @@ def main() -> None:
         initial_sidebar_state="expanded",
     )
     ensure_directories()
-    load_css()
+    # Default theme on first load.
+    st.session_state.setdefault("theme", "light")
+    apply_styles()
 
     # --- Authentication gate (portfolio bonus) ---
     if not login.render():
