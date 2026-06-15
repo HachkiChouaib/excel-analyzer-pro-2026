@@ -1,0 +1,16 @@
+# Streamlit configuration
+# We disable the automatic multipage navigation because the `pages/` modules
+# expose `render()` functions and are orchestrated by a custom sidebar in app.py.
+
+[client]
+showSidebarNavigation = false
+
+[theme]
+primaryColor = "#2563eb"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f1f5f9"
+textColor = "#0f172a"
+font = "sans serif"
+
+[server]
+maxUploadSize = 200

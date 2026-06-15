@@ -1,0 +1,45 @@
+# ===================================================================
+# Excel Analyzer Pro 2026 - Git ignore rules
+# ===================================================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Streamlit ---
+.streamlit/secrets.toml
+
+# --- IDE / Editor ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# --- Testing / coverage ---
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- User data & generated artifacts (keep folders, ignore content) ---
+data/*
+exports/*
+reports/*
+!data/.gitkeep
+!exports/.gitkeep
+!reports/.gitkeep
+
+# --- App-generated files ---
+*.pdf
+history.json
+users.json
