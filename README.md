@@ -14,6 +14,24 @@
   <img src="https://img.shields.io/badge/code%20style-PEP8-brightgreen" alt="PEP8">
 </p>
 
+<p align="center">
+  <a href="https://excel-analyzer-pro-2026.streamlit.app">
+    <img src="https://static.streamlit.io/badges/streamlit_badge_black_white.svg" alt="Open in Streamlit">
+  </a>
+</p>
+
+---
+
+## 🚀 Live Demo
+
+The app is deployed on **Streamlit Community Cloud**:
+
+👉 **https://excel-analyzer-pro-2026.streamlit.app**
+
+> _Demo note: the free tier uses ephemeral storage, so registered accounts and
+> analysis history reset when the server restarts. Create an account to explore,
+> then upload `samples/demo_sales.xlsx` to see every feature in action._
+
 ---
 
 ## 📝 Description
