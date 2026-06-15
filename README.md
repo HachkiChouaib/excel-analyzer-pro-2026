@@ -44,6 +44,7 @@ core function unit-testable without launching Streamlit.
 | **8. Export** | Download the cleaned dataset as Excel or CSV, or the full PDF report. |
 | **9. History** | Persistent log of past analyses (date, filename, dimensions). |
 | **10. Modern UI/UX** | Responsive layout, custom sidebar navigation, light/dark theme. |
+| **🎁 Bonus — Auth** | User registration & login with salted PBKDF2 password hashing; per-user analysis history. |
 
 ---
 
@@ -96,7 +97,20 @@ streamlit run app.py
 
 Then open the URL shown in the terminal (default: <http://localhost:8501>).
 
-**Workflow:** Dashboard (upload) → Analysis → Cleaning → Visualization → Report & Export.
+**First run:** create an account on the **Register** tab, then log in.
+
+**Workflow:** Login → Dashboard (upload) → Analysis → Cleaning → Visualization → Report & Export.
+
+### Try it with the demo dataset
+
+A ready-to-use sample with missing values, duplicates, outliers and correlated
+columns is provided (regenerate it any time):
+
+```bash
+python samples/generate_demo.py   # writes samples/demo_sales.xlsx
+```
+
+Upload `samples/demo_sales.xlsx` on the Dashboard page to explore every feature.
 
 ### Running the tests
 
@@ -121,22 +135,27 @@ excel-analyzer-pro/
 ├── data/                   # Runtime data & analysis history
 ├── exports/                # Generated exports
 ├── reports/                # Generated reports
+├── samples/                # Demo dataset + generator script
+│   └── generate_demo.py
 ├── utils/                  # Business logic (no Streamlit, fully testable)
 │   ├── file_handler.py     #   File I/O + validation
 │   ├── analyzer.py         #   Statistics + rule-based AI assessment
 │   ├── cleaner.py          #   Immutable cleaning operations
 │   ├── charts.py           #   Plotly figure factories
 │   ├── exporter.py         #   Excel / CSV / PDF export
-│   └── helpers.py          #   Formatting, history, column typing
+│   ├── auth.py             #   Registration / login (PBKDF2)
+│   └── helpers.py          #   Formatting, per-user history, column typing
 ├── pages/                  # UI layer (one render() per screen)
+│   ├── login.py
 │   ├── dashboard.py
 │   ├── analysis.py
 │   ├── cleaning.py
 │   ├── visualization.py
 │   └── report.py
-└── tests/                  # pytest unit tests
+└── tests/                  # pytest unit tests (23 passing)
     ├── test_analyzer.py
-    └── test_cleaner.py
+    ├── test_cleaner.py
+    └── test_auth.py
 ```
 
 ---

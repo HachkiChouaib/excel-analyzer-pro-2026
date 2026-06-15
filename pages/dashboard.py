@@ -34,7 +34,8 @@ def _handle_upload(uploaded_file) -> None:
     # Persist both the original and the working (cleanable) copy.
     st.session_state["df"] = df
     st.session_state["file_info"] = info
-    append_history(info.name, info.rows, info.columns)
+    # Record the analysis in the signed-in user's personal history.
+    append_history(info.name, info.rows, info.columns, st.session_state.get("user"))
     st.success(f"Loaded '{info.name}' successfully.")
 
 

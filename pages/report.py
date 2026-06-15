@@ -69,9 +69,9 @@ def render() -> None:
     st.success(insight.summary)
     st.json(kpis)
 
-    # --- History (Module 9) ---
+    # --- History (Module 9) — scoped to the signed-in user ---
     st.markdown("### 🕓 Analysis history")
-    history = load_history()
+    history = load_history(st.session_state.get("user"))
     if not history:
         st.info("No analyses recorded yet.")
     else:

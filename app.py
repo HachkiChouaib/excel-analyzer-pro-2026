@@ -15,7 +15,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from pages import analysis, cleaning, dashboard, report, visualization
+from pages import analysis, cleaning, dashboard, login, report, visualization
 from utils.helpers import ensure_directories
 
 # --- Static paths ---------------------------------------------------------
@@ -69,6 +69,15 @@ def render_sidebar() -> str:
             info = st.session_state["file_info"]
             st.success(f"Loaded: {info.name}\n\n{info.rows:,} rows × {info.columns} cols")
 
+        # --- Logged-in user panel ---
+        st.divider()
+        st.caption(f"👤 Signed in as **{st.session_state['user']}**")
+        if st.button("Log out", use_container_width=True):
+            # Clear session-scoped state on logout.
+            for key in ("user", "df", "file_info", "insight"):
+                st.session_state.pop(key, None)
+            st.rerun()
+
     return choice
 
 
@@ -82,6 +91,10 @@ def main() -> None:
     )
     ensure_directories()
     load_css()
+
+    # --- Authentication gate (portfolio bonus) ---
+    if not login.render():
+        return
 
     selected = render_sidebar()
     # Dispatch to the selected page's render function.

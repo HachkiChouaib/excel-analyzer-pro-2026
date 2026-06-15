@@ -21,6 +21,21 @@ REPORTS_DIR: Path = PROJECT_ROOT / "reports"
 HISTORY_FILE: Path = DATA_DIR / "history.json"
 
 
+def _history_path(username: str | None) -> Path:
+    """Return the history file path, scoped to a user when provided.
+
+    Args:
+        username: The owner's username, or ``None`` for the shared history.
+
+    Returns:
+        The :class:`Path` of the matching history JSON file.
+    """
+    if username:
+        safe = "".join(c for c in username.lower() if c.isalnum() or c in "-_")
+        return DATA_DIR / f"history_{safe}.json"
+    return HISTORY_FILE
+
+
 def ensure_directories() -> None:
     """Create the runtime directories if they do not already exist."""
     for directory in (DATA_DIR, EXPORTS_DIR, REPORTS_DIR):
@@ -79,16 +94,21 @@ def classify_columns(df: pd.DataFrame) -> dict[str, list[str]]:
     return {"numeric": numeric, "datetime": datetime_cols, "text": text}
 
 
-def load_history() -> list[dict[str, Any]]:
+def load_history(username: str | None = None) -> list[dict[str, Any]]:
     """Load the analysis history from disk.
+
+    Args:
+        username: When provided, loads that user's personal history;
+            otherwise loads the shared history.
 
     Returns:
         A list of history records, or an empty list if none exist yet.
     """
-    if not HISTORY_FILE.exists():
+    path = _history_path(username)
+    if not path.exists():
         return []
     try:
-        with HISTORY_FILE.open("r", encoding="utf-8") as fh:
+        with path.open("r", encoding="utf-8") as fh:
             data = json.load(fh)
         return data if isinstance(data, list) else []
     except (json.JSONDecodeError, OSError):
@@ -96,16 +116,21 @@ def load_history() -> list[dict[str, Any]]:
         return []
 
 
-def append_history(filename: str, rows: int, columns: int) -> None:
+def append_history(
+    filename: str, rows: int, columns: int, username: str | None = None
+) -> None:
     """Append a new entry to the persistent analysis history.
 
     Args:
         filename: Name of the analysed file.
         rows: Number of rows in the dataset.
         columns: Number of columns in the dataset.
+        username: When provided, the entry is stored in that user's
+            personal history file.
     """
     ensure_directories()
-    records = load_history()
+    path = _history_path(username)
+    records = load_history(username)
     records.insert(
         0,
         {
@@ -117,5 +142,5 @@ def append_history(filename: str, rows: int, columns: int) -> None:
     )
     # Keep only the 50 most recent analyses to bound file growth.
     records = records[:50]
-    with HISTORY_FILE.open("w", encoding="utf-8") as fh:
+    with path.open("w", encoding="utf-8") as fh:
         json.dump(records, fh, ensure_ascii=False, indent=2)
